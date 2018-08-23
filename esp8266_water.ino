@@ -71,7 +71,7 @@ void setup() {
   Serial.println("");
   Serial.println("Connected!");
 
-  ArduinoOTA.setHostname("WaterPuls");
+  ArduinoOTA.setHostname("WaterMeter");
 
   ArduinoOTA.onStart([]() {
     Serial.println("Start Ota");

@@ -25,7 +25,7 @@
 //update interval for slow changing values in milliseconds for mqtt
 #define MQTT_REGULAR_UPDATE_INTERVAL  10000
 
-#define MQTT_TOPIC "waterpuls"
+#define MQTT_TOPIC "watermeter"
 
 #define DATA_PIN 3
 

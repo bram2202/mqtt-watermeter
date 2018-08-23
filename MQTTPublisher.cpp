@@ -12,7 +12,7 @@ MQTTPublisher::MQTTPublisher(SettingsManager * settingsManager, bool inDebugMode
 
 MQTTPublisher::~MQTTPublisher()
 {
-  client.publish("WaterPuls", "offline");
+  client.publish("WaterMeter", "offline");
   client.disconnect();
 }
 
@@ -28,7 +28,7 @@ bool MQTTPublisher::reconnect()
   }
 
   // Create a random client ID
-  String clientId = "WaterPulsLogger-";
+  String clientId = "WaterMeter-";
   clientId += String(random(0xffff), HEX);
 
   // Attempt to connect
@@ -49,7 +49,7 @@ bool MQTTPublisher::reconnect()
     if (debugMode)
       Serial.println("connected");
     // Once connected, publish an announcement...
-    client.publish("WaterPuls", "online");
+    client.publish("WaterMeter", "online");
 
     return true;
   }
