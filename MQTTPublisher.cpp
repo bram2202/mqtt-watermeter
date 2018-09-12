@@ -12,7 +12,7 @@ MQTTPublisher::MQTTPublisher(SettingsManager * settingsManager, bool inDebugMode
 
 MQTTPublisher::~MQTTPublisher()
 {
-  client.publish("WaterMeter", "offline");
+  client.publish("watermeter", "offline");
   client.disconnect();
 }
 
@@ -28,7 +28,7 @@ bool MQTTPublisher::reconnect()
   }
 
   // Create a random client ID
-  String clientId = "WaterMeter-";
+  String clientId = "watermeter-";
   clientId += String(random(0xffff), HEX);
 
   // Attempt to connect
@@ -46,10 +46,12 @@ bool MQTTPublisher::reconnect()
 
   if (clientConnected)
   {
-    if (debugMode)
+    if (debugMode){
       Serial.println("connected");
+    }
+      
     // Once connected, publish an announcement...
-    client.publish("WaterMeter", "online");
+    client.publish("watermeter", "online");
 
     return true;
   }
@@ -102,7 +104,6 @@ void MQTTPublisher::handle()
   if (sendRegular || sendQuick)
   {
 
-
     auto mqttTopic = mqttSettings->mqttTopic;
     if (debugMode)
     {
@@ -112,22 +113,7 @@ void MQTTPublisher::handle()
 
     if (sendQuick)
     {
-      //send out fast changing values
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/online", "1");
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vpv1", String(inverters[cnt].vpv1, 1));
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vpv2", String(inverters[cnt].vpv2, 1));
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/ipv1", String(inverters[cnt].ipv1, 1));
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/ipv2", String(inverters[cnt].ipv2, 1));
-      //		//publishing sometimes cuases the wdt to reset the ESP.
-      //		//On the github page of the pubsubclient it was suggested to add extra client.loop().
-      //		client.loop();
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/vac1", String(inverters[cnt].vac1, 1));
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/iac1", String(inverters[cnt].iac1, 1));
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/fac1", String(inverters[cnt].fac1, 2));
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/pac", String(inverters[cnt].pac));
-      //		if (sendOk) sendOk = publishOnMQTT(prependTopic, "/temp", String(inverters[cnt].temp, 1));
 
-      // HERE
       uint32_t currentTime = millis();
       if (currentTime - lastSend > mqttSettings->sendFrequency ) {
         lastSend = currentTime;
@@ -165,7 +151,7 @@ void MQTTPublisher::handle()
         }
 
       }
-      // TO HERE
+      
     }
     else
     {
@@ -195,4 +181,3 @@ bool MQTTPublisher::publishOnMQTT(String prepend, String topic, String value)
   yield();
   return retVal;
 }
-
