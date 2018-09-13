@@ -124,7 +124,7 @@ void MQTTPublisher::handle()
           Serial.print("l/min:");
           Serial.println(flow);
           if (flow < ((uint32_t)mqttSettings->maxFlow)) {
-            if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/flow", String(flow, 1));
+            if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/flow", String(flow, 4));
           }
         }
 
@@ -139,14 +139,14 @@ void MQTTPublisher::handle()
           oldPulseCount = pulseCount;
           Serial.print("pulsecount:");
           Serial.println(pulseCount);
-          if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/puls", String(pulseCount, 1));
+          if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/puls", String(pulseCount));
 
           double volume = ((double)pulseCount / (double)mqttSettings->pulsFactor);
           if (volume != oldvolume) {
             oldvolume = volume;
             Serial.print("volume:");
             Serial.println(volume, 3);
-            if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/vol", String(volume, 1));
+            if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/vol", String(volume, 4));
           }
         }
 

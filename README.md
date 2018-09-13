@@ -16,6 +16,15 @@ For example to use with `Hass.io` [[link]](https://www.home-assistant.io/)
   Than install wemos boards (esp8266 by ESP8266 Community)  `tools` -> `board` -> `boards manager`
 * Install lib `pubsubclient`[[link]](https://github.com/knolleary/pubsubclient)
 
+## Connection scheme
+| ESP8266 | TCRT5000 |  
+| :--------- |:-------| 
+| 3.3v | VCC  |
+| GND  | GND  |
+| RX   | D0   |
+
+## installation 
+`TODO`
 
 ## Settings
 Copy `Settings.example.h` to `Settings.h` and fill in the correct data.
@@ -42,17 +51,13 @@ Subscribe to `watermeter/<topic>` in your MQTT client. prefix can be changes in 
 
 | Topic | Description| Unit  |
 | ------------- |:-------------:| -----:|
-| vol     | ?????? | m3 |
-| puls    | pulses between posts | int |
-| flow    | water flow last X min| l/min |
+| vol     | total m3 since reboot | m3 |
+| puls    | total pulses since reboot | int |
+| flow    | water flow in l/min| l/min |
 
 Example: 
 ```
-watermeter/vol 6
-watermeter/puls 500
-watermeter/flow 5
+watermeter/vol:  0.005
+watermeter/puls: 76
+watermeter/flow: 37.0425
 ```
-
-## TODO
-* Testing
-* Expand readme
