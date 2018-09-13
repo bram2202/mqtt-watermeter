@@ -23,8 +23,13 @@ For example to use with `Hass.io` [[link]](https://www.home-assistant.io/)
 | GND  | GND  |
 | RX   | D0   |
 
-## installation 
-`TODO`
+## Installation 
+Align the IR module with the metal half disk inside the meter,
+Try to mount it above 1 half, not in its center, so when it turns the the sensor get triggerd.
+Adjust the trimpot so it just triggered when the disk is underneath.
+
+![elster_v200](https://github.com/bram2202/mqtt-watermeter/blob/master/docs/elster_v200.png "elster_v200")
+
 
 ## Settings
 Copy `Settings.example.h` to `Settings.h` and fill in the correct data.
