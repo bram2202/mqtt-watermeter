@@ -2,7 +2,6 @@
 #pragma once
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include "SettingsManager.h"
 #include <vector>
 #include "PubSubClient.h"
 #include "WiFiClient.h"
@@ -24,16 +23,9 @@ extern uint32_t lastSend;
 extern uint32_t lastPulse;
 extern double ppl;
 
-//test
-
-
-
 class MQTTPublisher
 {
   private:
-    SettingsManager::Settings * mqttSettings;
-    SettingsManager * mqttSettingsManager;
-
     bool debugMode;
     bool isStarted;
 
@@ -44,7 +36,7 @@ class MQTTPublisher
     bool publishOnMQTT(String prepend, String topic, String value);
     bool reconnect();
   public:
-    MQTTPublisher(SettingsManager * settingsManager, bool inDebugMode = false);
+    MQTTPublisher(bool inDebugMode = false);
     ~MQTTPublisher();
 
     void start();
@@ -52,4 +44,3 @@ class MQTTPublisher
 
     void handle();
 };
-

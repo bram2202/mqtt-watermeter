@@ -34,3 +34,5 @@
 #define MAX_FLOW 40
 
 #define SEND_FREQUENCY 30000
+
+#define DEBUGE_MODE true

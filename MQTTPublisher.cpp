@@ -1,12 +1,12 @@
 #include "MQTTPublisher.h"
+#include "Settings.h"
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-MQTTPublisher::MQTTPublisher(SettingsManager * settingsManager, bool inDebugMode)
+MQTTPublisher::MQTTPublisher(bool inDebugMode)
 {
   randomSeed(micros());
-  mqttSettingsManager = settingsManager;
   debugMode = inDebugMode;
 }
 
@@ -23,7 +23,7 @@ bool MQTTPublisher::reconnect()
   if (debugMode)
   {
     Serial.print("Attempting MQTT connection to server: ");
-    Serial.print(mqttSettings->mqttHostName);
+    Serial.print(MQTT_HOST_NAME);
     Serial.println("...");
   }
 
@@ -33,10 +33,10 @@ bool MQTTPublisher::reconnect()
 
   // Attempt to connect
   bool clientConnected;
-  if (mqttSettings->mqttUserName.length())
+  if (String(MQTT_USER_NAME).length())
   {
     Serial.println("Using user credientials for authentication.");
-    clientConnected = client.connect(clientId.c_str(), mqttSettings->mqttUserName.c_str(), mqttSettings->mqttPassword.c_str());
+    clientConnected = client.connect(clientId.c_str(), MQTT_USER_NAME, MQTT_PASSWORD);
   }
   else
   {
@@ -69,14 +69,13 @@ bool MQTTPublisher::reconnect()
 
 void MQTTPublisher::start()
 {
-  mqttSettings = mqttSettingsManager->GetSettings();
-  if (mqttSettings->mqttHostName.length() == 0 || mqttSettings->mqttPort == 0)
+  if (String(MQTT_HOST_NAME).length() == 0 || MQTT_PORT == 0)
   {
     Serial.println("MQTT disabled. No hostname or port set.");
     return; //not configured
   }
   Serial.println("MQTT enabled. Connecting.");
-  client.setServer(mqttSettings->mqttHostName.c_str(), mqttSettings->mqttPort);
+  client.setServer(MQTT_HOST_NAME, MQTT_PORT);
   reconnect(); //connect right away
   isStarted = true;
 }
@@ -98,18 +97,18 @@ void MQTTPublisher::handle()
   //got a valid mqtt connection. Loop through the inverts and send out the data if needed
   client.loop();
 
-  bool sendRegular = millis() - lastSentRegularUpdate > mqttSettings->mqttRegularUpdateInterval;
-  bool sendQuick = millis() - lastSentQuickUpdate > mqttSettings->mqttQuickUpdateInterval;
+  bool sendRegular = millis() - lastSentRegularUpdate > MQTT_REGULAR_UPDATE_INTERVAL;
+  bool sendQuick = millis() - lastSentQuickUpdate > MQTT_QUICK_UPDATE_INTERVAL;
   bool sendOk = true; //if a mqtt message fails, wait for retransmit at a later time
   if (sendRegular || sendQuick)
   {
 
-    auto mqttTopic = mqttSettings->mqttTopic;
+    auto mqttTopic = MQTT_TOPIC;
     if (sendQuick)
     {
 
       uint32_t currentTime = millis();
-      if (currentTime - lastSend > mqttSettings->sendFrequency ) {
+      if (currentTime - lastSend > SEND_FREQUENCY ) {
         lastSend = currentTime;
 
         // send flow
@@ -117,7 +116,7 @@ void MQTTPublisher::handle()
           oldflow = flow;
           Serial.print("l/min:");
           Serial.println(flow);
-          if (flow < ((uint32_t)mqttSettings->maxFlow)) {
+          if (flow < ((uint32_t)MAX_FLOW)) {
             if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/flow", String(flow, 4));
           }
         }
@@ -135,7 +134,7 @@ void MQTTPublisher::handle()
           Serial.println(pulseCount);
           if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/puls", String(pulseCount));
 
-          double volume = ((double)pulseCount / (double)mqttSettings->pulsFactor);
+          double volume = ((double)pulseCount / (double)PULSE_FACTOR);
           if (volume != oldvolume) {
             oldvolume = volume;
             Serial.print("volume:");
