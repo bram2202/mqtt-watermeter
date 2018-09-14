@@ -46,10 +46,10 @@ bool MQTTPublisher::reconnect()
 
   if (clientConnected)
   {
-    if (debugMode){
+    if (debugMode) {
       Serial.println("connected");
     }
-      
+
     // Once connected, publish an announcement...
     client.publish("watermeter", "online");
 
@@ -105,12 +105,6 @@ void MQTTPublisher::handle()
   {
 
     auto mqttTopic = mqttSettings->mqttTopic;
-    if (debugMode)
-    {
-      Serial.print("Publishing prepend topic for the pulsmeter is: ");
-      Serial.println(mqttTopic);
-    }
-
     if (sendQuick)
     {
 
@@ -151,14 +145,8 @@ void MQTTPublisher::handle()
         }
 
       }
-      
-    }
-    else
-    {
-      //TODO: Rest of data
-    }
 
-    //On the github page of the pubsubclient it was suggested to add extra client.loop().
+    }
     client.loop();
   }
 
@@ -166,14 +154,7 @@ void MQTTPublisher::handle()
     lastSentQuickUpdate = millis();
   if (sendRegular)
     lastSentRegularUpdate = millis();
-
-  if (debugMode)
-  {
-    Serial.print("MQTT send status: ");
-    Serial.println(sendOk);
-  }
 }
-
 
 bool MQTTPublisher::publishOnMQTT(String prepend, String topic, String value)
 {

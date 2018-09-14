@@ -56,7 +56,7 @@ void setup() {
 
   // Setup Pin and interrupt
   pinMode(settings->dataPin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(settings->dataPin), onPulse, FALLING);
+  attachInterrupt(digitalPinToInterrupt(settings->dataPin), pinTrigger, FALLING);
 
   // Setup Wifi
   WiFi.mode(WIFI_STA);
@@ -102,7 +102,7 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   mqqtPublisher.start();
-  
+
 }
 
 void loop() {
@@ -113,6 +113,17 @@ void loop() {
   yield();
 }
 
+
+void pinTrigger() {
+  static unsigned long last_interrupt_time = 0;
+  unsigned long interrupt_time = millis();
+  if (interrupt_time - last_interrupt_time > 1000) //1000ms
+  {
+    Serial.println("Trigger");
+    onPulse();
+  }
+  last_interrupt_time = interrupt_time;
+}
 
 void onPulse()
 {
