@@ -3,6 +3,7 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiUdp.h>
 #include "MQTTPublisher.h"
+#include "WifiConnector.h"
 #include "ESP8266mDNS.h"
 #include "Settings.h"
 
@@ -17,8 +18,10 @@ double oldvolume = 0;
 uint32_t lastSend = 0;
 uint32_t lastPulse = 0;
 double ppl = 0;  // Pulses per liter
+bool hasWIFI = false;
 
 MQTTPublisher mqqtPublisher(DEBUGE_MODE);
+WifiConnector wifiConnector(DEBUGE_MODE);
 WiFiUDP ntpUDP;
 
 void setup() {
@@ -26,33 +29,25 @@ void setup() {
   ppl = ((double)PULSE_FACTOR) / 1000;
 
   // Init
-  if(DEBUGE_MODE)
+  if(DEBUGE_MODE){
     Serial.begin(115200);
-    
-  Serial.println("Booting");
+    Serial.println("Booting");
+  }
 
   // Setup Pin and interrupt
   pinMode(DATA_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(DATA_PIN), pinTrigger, FALLING);
 
   // Setup Wifi
-  WiFi.mode(WIFI_STA);
-  WiFi.hostname(WIFI_HOSTNAME);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  wifiConnector.start();
 
-  Serial.print("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("Connected!");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-
+  // Setup MQTT
   mqqtPublisher.start();
 }
 
 void loop() {
+  wifiConnector.handle();
+  yield();
   mqqtPublisher.handle();
   yield();
 }

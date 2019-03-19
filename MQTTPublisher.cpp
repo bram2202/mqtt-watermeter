@@ -22,7 +22,7 @@ bool MQTTPublisher::reconnect()
   lastConnectionAttempt = millis();
   if (debugMode)
   {
-    Serial.print("Attempting MQTT connection to server: ");
+    Serial.print("MQTT) Attempting connection to server: ");
     Serial.print(MQTT_HOST_NAME);
     Serial.println("...");
   }
@@ -35,19 +35,19 @@ bool MQTTPublisher::reconnect()
   bool clientConnected;
   if (String(MQTT_USER_NAME).length())
   {
-    Serial.println("Using user credientials for authentication.");
+    Serial.println("MQTT) Connecting with credientials");
     clientConnected = client.connect(clientId.c_str(), MQTT_USER_NAME, MQTT_PASSWORD);
   }
   else
   {
-    Serial.println("Connecting without user credentials.");
+    Serial.println("MQTT) Connecting without credentials.");
     clientConnected = client.connect(clientId.c_str());
   }
 
   if (clientConnected)
   {
     if (debugMode) {
-      Serial.println("connected");
+      Serial.println("MQTT) connected");
     }
 
     // Once connected, publish an announcement...
@@ -58,7 +58,7 @@ bool MQTTPublisher::reconnect()
   else {
     if (debugMode)
     {
-      Serial.print("failed, rc=");
+      Serial.print("MQTT) failed, rc=");
       Serial.print(client.state());
     }
   }
@@ -71,10 +71,12 @@ void MQTTPublisher::start()
 {
   if (String(MQTT_HOST_NAME).length() == 0 || MQTT_PORT == 0)
   {
-    Serial.println("MQTT disabled. No hostname or port set.");
+    Serial.println("MQTT) disabled. No hostname or port set.");
     return; //not configured
   }
-  Serial.println("MQTT enabled. Connecting.");
+  if(debugMode){
+    Serial.println("MQTT) enabled. Connecting.");
+  }
   client.setServer(MQTT_HOST_NAME, MQTT_PORT);
   reconnect(); //connect right away
   isStarted = true;
@@ -114,8 +116,10 @@ void MQTTPublisher::handle()
         // send flow
         if (flow != oldflow) {
           oldflow = flow;
-          Serial.print("l/min:");
-          Serial.println(flow);
+          if(debugMode){
+            Serial.print("MQTT) l/min:");
+            Serial.println(flow);
+          }
           if (flow < ((uint32_t)MAX_FLOW)) {
             if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/flow", String(flow, 4));
           }
@@ -130,15 +134,19 @@ void MQTTPublisher::handle()
         if (pulseCount != oldPulseCount) {
 
           oldPulseCount = pulseCount;
-          Serial.print("pulsecount:");
-          Serial.println(pulseCount);
+          if(debugMode){
+            Serial.print("MQTT) pulsecount:");
+            Serial.println(pulseCount);
+          }
           if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/puls", String(pulseCount));
 
           double volume = ((double)pulseCount / (double)PULSE_FACTOR);
           if (volume != oldvolume) {
             oldvolume = volume;
-            Serial.print("volume:");
-            Serial.println(volume, 3);
+            if(debugMode){
+              Serial.print("MQTT) volume:");
+              Serial.println(volume, 3);
+            }
             if (sendOk) sendOk = publishOnMQTT(mqttTopic, "/vol", String(volume, 4));
           }
         }
